@@ -1,0 +1,46 @@
+---
+
+- hosts: webservers
+  remote_user: root
+  sudo: True
+  sudo_user: root
+  tasks:
+
+    - name: Copy the files to local  incoming layer.
+      copy: src={{ item }} dest=/kohls/stage/incoming/cmdm/
+      with_fileglob:
+         - /home/administrator/Projects/evoc/CurrentData/*
+
+    - name: Copy the files to HDFS  incoming layer.
+      copy: src={{ item }} dest=/incoming/cmdm/
+      with_fileglob:
+         - /home/administrator/Projects/evoc/CurrentData/*
+
+    - name: Copy the Azkaban tar folder to /root directory of remote host
+      copy: src={{ item }} dest=/root/
+      with_fileglob:
+         - /home/administrator/azkaban-solo-server-2.5.0.tar.gz
+
+    - name: Create an /evoc directory.
+      shell: mkdir /evoc
+
+    - name: Copy the Project Directory to remote host
+      copy: src=/home/administrator/Projects/evoc/evoc dest=/evoc
+
+    - name: Copy Python script on remote host
+      copy: src={{ item }} dest=/root/
+      with_fileglob:
+         - /home/administrator/Testing_Framework_shared/new.py
+
+
+    - name: Execute python script
+      command: python /root/new.py
+      register: python_output
+    - debug: msg="{{python_output.stdout}}"
+
+#    - name: Run Validation Module.
+#      shell: /home/nzhdusr/dev/evoc/current/cmdm-validation/bin/cmdm-validation.sh >> validationlog1.txt  || /bin/true
+#      args:
+#        chdir: /home/nzhdusr/logs
+#        creates: validationlog2.txt
+
