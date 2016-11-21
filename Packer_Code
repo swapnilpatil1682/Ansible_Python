@@ -1,0 +1,39 @@
+{
+ "variables": {
+   "aws_access_key": "AKIAIMNCLD7PMKJZ7EIQ",
+   "aws_secret_key": "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"
+ },
+ "builders": [{
+   "type": "amazon-ebs",
+   "access_key": "{{user `aws_access_key`}}",
+   "secret_key": "{{user `aws_secret_key`}}",
+   "region": "us-west-2",
+   "source_ami": "ami-5ec1673e",
+   "instance_type": "t2.micro",
+   "ssh_username": "ec2-user",
+   "ami_name": "kohls-gtrends {{timestamp}}"
+ }],
+ "provisioners": [
+   {
+   "type": "shell",
+   "inline": [
+     "sleep 30",
+     "sudo yum clean all",
+     "sudo yum update -y",
+     "sudo yum -y groupinstall 'Development Tools'",
+     "sudo yum install -y openssl openssl-devel libxml2 libxslt libxml2-devel libxslt-devel libffi libffi-devel python-dev gcc gcc-c++ gcc-gfortran libgfortran python27 python-setuptools python27-devel python27-pip",
+     "sudo pip-2.7 install --upgrade ansible",
+     "sudo pip-2.7 install cython",
+     "sudo pip-2.7 install numpy",
+     "sudo pip-2.7 install lxml",
+     "sudo pip-2.7 install pandas", 
+     "sudo pip-2.7 install pytrends",
+     "sudo pip-2.7 install boto3"
+   ]
+ },
+ {
+   "type": "file",
+   "source": "test.zip",
+   "destination": "/tmp/test.zip"
+ }]
+}
